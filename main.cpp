@@ -5,7 +5,7 @@
 
 int main() {
     auto map = Map(16, 12);
-    auto player = Player(8, 6, 0, 0);
+    auto player = Player(8, 6, 0, 0, map);
 
     InitWindow(640, 480, "RaysGame");
     SetWindowState(FLAG_WINDOW_RESIZABLE);
@@ -15,6 +15,7 @@ int main() {
         ClearBackground(GRAY);
         map.render2D();
         player.render2D();
+        player.updatePlayer();
 
         EndDrawing();
     }
