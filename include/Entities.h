@@ -2,10 +2,13 @@
 
 #include "Map.h"
 #include "utils.h"
+#include <functional>
+#include <cmath>
 
 struct RayData {
     float x;
     float y;
+    float angle;
 };
 
 class Player {
@@ -14,7 +17,7 @@ private:
 
     [[nodiscard]] RayData calculateVerticalRay(float ray_angle) const;
 
-    [[nodiscard]] RayData findShortestRay(float angle) const;
+    [[nodiscard]] RayData findShortestRay(float ray_angle) const;
 
 public:
     struct {
@@ -23,13 +26,15 @@ public:
     } position;
     float angle;
     Map &map;
-    const float move_speed = 0.1f;
-    const float playerSize = 5.0f;
 
     Player(float x, float y, float angle, Map &map)
             : position({x, y}), angle(angle), map(map) {}
 
     void render2D() const;
+
+    void calculateAllRays(const std::function<void(int, RayData)> &callback) const;
+
+    [[nodiscard]] float calculateRayLength(RayData ray) const;
 
     void updatePlayer();
 };

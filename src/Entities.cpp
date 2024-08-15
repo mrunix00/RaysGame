@@ -13,6 +13,15 @@ void Player::render2D() const {
              position.x * tileSize + playerSize * 3 * std::cos(angle),
              position.y * tileSize + playerSize * 3 * std::sin(angle),
              RED);
+    calculateAllRays([this](int, RayData ray) {
+        DrawLineEx(
+                {this->position.x * tileSize,
+                 this->position.y * tileSize},
+                {ray.x * tileSize + 1,
+                 ray.y * tileSize + 1},
+                3,
+                GREEN);
+    });
 }
 
 void Player::updatePlayer() {
@@ -37,26 +46,6 @@ void Player::updatePlayer() {
     if (map.data[static_cast<int>(pos_y) * map.width + static_cast<int>(pos_x)] == TileType::EMPTY) {
         position.x = pos_x;
         position.y = pos_y;
-    }
-
-    constexpr int fov_deg = fov * (180 / pi);
-    constexpr auto one_degree = pi / 180;
-    auto start = angle - half_fov;
-    for (float i = 0; i < fov_deg;) {
-        auto a = start + i * one_degree;
-        if (a < 0)
-            a += 2 * pi;
-        if (a > 2 * pi)
-            a -= 2 * pi;
-        auto ray = findShortestRay(a);
-        DrawLineEx(
-                {position.x * tileSize,
-                 position.y * tileSize},
-                {ray.x * tileSize,
-                 ray.y * tileSize},
-                3,
-                GREEN);
-        i++;
     }
 }
 
@@ -85,7 +74,7 @@ RayData Player::calculateHorizontalRay(float ray_angle) const {
         ray_x += ray_xoffset / 10;
         ray_y += ray_yoffset / 10;
     }
-    return {ray_x, ray_y};
+    return {ray_x, ray_y, ray_angle};
 }
 
 RayData Player::calculateVerticalRay(float ray_angle) const {
@@ -112,18 +101,37 @@ RayData Player::calculateVerticalRay(float ray_angle) const {
         ray_x += ray_xoffset / 100;
         ray_y += ray_yoffset / 100;
     }
-    return {ray_x, ray_y};
+    return {ray_x, ray_y, ray_angle};
 }
 
-RayData Player::findShortestRay(float angle) const {
-    auto hRay = calculateHorizontalRay(angle);
-    auto vRay = calculateVerticalRay(angle);
-    auto hx = hRay.x - position.x, hy = hRay.y - position.y;
-    auto vx = vRay.x - position.x, vy = vRay.y - position.y;
-    auto hLength = std::sqrt(hx * hx + hy * hy);
-    auto vLength = std::sqrt(vx * vx + vy * vy);
+RayData Player::findShortestRay(float ray_angle) const {
+    auto hRay = calculateHorizontalRay(ray_angle);
+    auto vRay = calculateVerticalRay(ray_angle);
+    auto hLength = calculateRayLength(hRay);
+    auto vLength = calculateRayLength(vRay);
     if (hLength < vLength)
         return hRay;
     else
         return vRay;
+}
+
+void Player::calculateAllRays(const std::function<void(int, RayData)> &callback) const {
+
+    auto start = angle - half_fov;
+    for (int i = 0; i < fov_deg;) {
+        auto a = start + i * one_degree;
+        if (a < 0)
+            a += 2 * pi;
+        if (a > 2 * pi)
+            a -= 2 * pi;
+        auto ray = findShortestRay(a);
+        callback(i, ray);
+        i++;
+    }
+}
+
+float Player::calculateRayLength(RayData ray) const {
+    auto x = ray.x - position.x;
+    auto y = ray.y - position.y;
+    return std::sqrt(x * x + y * y);
 }
