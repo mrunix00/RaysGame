@@ -15,7 +15,7 @@ int main() {
         ClearBackground(GRAY);
         player.updatePlayer();
 
-        player.calculateAllRays([&](int r, RayData ray) {
+        player.calculateAllRays([&](float r, RayData ray) {
             float ray_length = player.calculateRayLength(ray);
             float corrected_angle = player.angle - ray.angle;
             if (corrected_angle < 0)

@@ -115,10 +115,9 @@ RayData Player::findShortestRay(float ray_angle) const {
         return vRay;
 }
 
-void Player::calculateAllRays(const std::function<void(int, RayData)> &callback) const {
-
+void Player::calculateAllRays(const std::function<void(float, RayData)> &callback) const {
     auto start = angle - half_fov;
-    for (int i = 0; i < fov_deg;) {
+    for (float i = 0; i < fov_deg;) {
         auto a = start + i * one_degree;
         if (a < 0)
             a += 2 * pi;
@@ -126,7 +125,7 @@ void Player::calculateAllRays(const std::function<void(int, RayData)> &callback)
             a -= 2 * pi;
         auto ray = findShortestRay(a);
         callback(i, ray);
-        i++;
+        i += 0.05f;
     }
 }
 

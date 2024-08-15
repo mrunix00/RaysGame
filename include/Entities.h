@@ -32,7 +32,7 @@ public:
 
     void render2D() const;
 
-    void calculateAllRays(const std::function<void(int, RayData)> &callback) const;
+    void calculateAllRays(const std::function<void(float, RayData)> &callback) const;
 
     [[nodiscard]] float calculateRayLength(RayData ray) const;
 
