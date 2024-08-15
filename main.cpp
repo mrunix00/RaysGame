@@ -5,7 +5,7 @@
 
 int main() {
     auto map = Map(16, 12);
-    auto player = Player(8, 6, 0, 0, map);
+    auto player = Player(8, 6, 0, map);
 
     InitWindow(640, 480, "RaysGame");
     SetWindowState(FLAG_WINDOW_RESIZABLE);
