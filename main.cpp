@@ -27,11 +27,18 @@ int main() {
             if (line_height > screenWidth)
                 line_height = screenWidth;
             float line_offset = (float) screenHeight - line_height;
+
+            float lighting_factor = 1.0f / (1.0f + (ray_length * 0.05f));
+            Color color = {0,
+                           0,
+                           static_cast<unsigned char>(255 * lighting_factor),
+                           255,};
+
             DrawRectangle((r * lineThickness),
                           line_offset / 2,
                           lineThickness,
                           line_height,
-                          BLUE);
+                          color);
         });
         EndDrawing();
     }
