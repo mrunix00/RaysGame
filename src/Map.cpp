@@ -51,3 +51,11 @@ void Map::render2D() const {
         }
     }
 }
+
+TileType Map::at(int x, int y) const {
+    return data[x + y * width];
+}
+
+bool Map::in_bounds(int x, int y) const {
+    return x >= 0 && x < width && y >= 0 && y < height;
+}

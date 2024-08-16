@@ -16,4 +16,6 @@ struct Map {
     ~Map();
     void print() const;
     void render2D() const;
+    [[nodiscard]] TileType at(int x, int y) const;
+    [[nodiscard]] bool in_bounds(int x, int y) const;
 };

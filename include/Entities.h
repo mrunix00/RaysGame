@@ -9,6 +9,7 @@ struct RayData {
     float x;
     float y;
     float angle;
+    bool is_vertical;
 };
 
 class Player {

@@ -50,58 +50,37 @@ void Player::updatePlayer() {
 }
 
 RayData Player::calculateHorizontalRay(float ray_angle) const {
-    float ray_x, ray_y, ray_xoffset, ray_yoffset;
-    float aTan = -1 / std::tan(ray_angle);
-    if (ray_angle > pi) {
-        ray_y = position.y;
-        ray_x = position.x + (position.y - ray_y) * aTan;
-        ray_yoffset = -0.1;
-        ray_xoffset = -ray_yoffset * aTan;
-    } else if (ray_angle < pi) {
-        ray_y = position.y;
-        ray_x = position.x + (position.y - ray_y) * aTan;
-        ray_yoffset = 0.1;
-        ray_xoffset = -ray_yoffset * aTan;
-    } else if (ray_angle == 0 || ray_angle == pi) {
-        ray_x = position.x;
-        ray_y = position.y;
-        ray_xoffset = 0.1;
-        ray_yoffset = 0;
+    if (ray_angle == 0 || ray_angle == pi) {
+        return {position.x, position.y, ray_angle, false};
     }
+    float ray_x = position.x, ray_y = position.y;
+    float aTan = -1.0f / std::tan(ray_angle);
+    float ray_yoffset = ray_angle > pi ? -ray_step : ray_step;
+    float ray_xoffset = -ray_yoffset * aTan;
 
-    while (ray_x >= 0 && ray_x < map.width && ray_y >= 0 && ray_y < map.height &&
-           map.data[static_cast<int>(ray_y) * map.width + static_cast<int>(ray_x)] == TileType::EMPTY) {
-        ray_x += ray_xoffset / 10;
-        ray_y += ray_yoffset / 10;
+    while (map.in_bounds(ray_x, ray_y) &&
+           map.at(ray_x, ray_y) == TileType::EMPTY) {
+        ray_x += ray_xoffset;
+        ray_y += ray_yoffset;
     }
-    return {ray_x, ray_y, ray_angle};
+    return {ray_x, ray_y, ray_angle, false};
 }
 
 RayData Player::calculateVerticalRay(float ray_angle) const {
-    float ray_x, ray_y, ray_xoffset, ray_yoffset;
+    if (ray_angle == 0 || ray_angle == pi) {
+        return {position.x, position.y, ray_angle, true};
+    }
+    float ray_x = position.x, ray_y = position.y;
     float nTan = -std::tan(ray_angle);
-    if (ray_angle == pi2 || ray_angle == pi3) {
-        ray_x = position.x;
-        ray_y = position.y;
-        ray_xoffset = 0.1;
-        ray_yoffset = 0;
-    } else if (ray_angle > pi2 && ray_angle < pi3) {
-        ray_x = position.x;
-        ray_y = position.y + (position.x - ray_x) * nTan;
-        ray_xoffset = -1;
-        ray_yoffset = -ray_xoffset * nTan;
-    } else {
-        ray_x = position.x + 1;
-        ray_y = position.y + (position.x - ray_x) * nTan;
-        ray_xoffset = 1;
-        ray_yoffset = -ray_xoffset * nTan;
+    float ray_xoffset = ray_angle > pi2 && ray_angle < pi3 ? -ray_step : ray_step;
+    float ray_yoffset = -ray_xoffset * nTan;
+
+    while (map.in_bounds(ray_x, ray_y) &&
+           map.at(ray_x, ray_y) == TileType::EMPTY) {
+        ray_x += ray_xoffset;
+        ray_y += ray_yoffset;
     }
-    while (ray_x >= 0 && ray_x < map.width && ray_y >= 0 && ray_y < map.height &&
-           map.data[static_cast<int>(ray_y) * map.width + static_cast<int>(ray_x)] == TileType::EMPTY) {
-        ray_x += ray_xoffset / 100;
-        ray_y += ray_yoffset / 100;
-    }
-    return {ray_x, ray_y, ray_angle};
+    return {ray_x, ray_y, ray_angle, true};
 }
 
 RayData Player::findShortestRay(float ray_angle) const {
@@ -125,12 +104,11 @@ void Player::calculateAllRays(const std::function<void(float, RayData)> &callbac
             a -= 2 * pi;
         auto ray = findShortestRay(a);
         callback(i, ray);
-        i += 0.05f;
+        i += fov_step_size;
     }
 }
 
 float Player::calculateRayLength(RayData ray) const {
-    auto x = ray.x - position.x;
-    auto y = ray.y - position.y;
-    return std::sqrt(x * x + y * y);
+    return std::sqrt((ray.x - position.x) * (ray.x - position.x) +
+                     (ray.y - position.y) * (ray.y - position.y));
 }
