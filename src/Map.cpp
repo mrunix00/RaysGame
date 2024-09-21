@@ -1,4 +1,5 @@
 #include <iostream>
+#include <ctime>
 #include "../include/Map.h"
 #include "raylib.h"
 #include "../include/utils.h"
