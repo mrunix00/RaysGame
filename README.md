@@ -2,8 +2,7 @@
 
 A simple ray casting engine.
 
-https://user-images.githubusercontent.com/mrunix00/RaysGame/assets/raysgame.mp4
-
+https://github.com/user-attachments/assets/85340947-661f-44fe-aa54-ee995328f182
 
 ## Building
 
